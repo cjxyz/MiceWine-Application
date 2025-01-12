@@ -9,7 +9,7 @@
         tools:ignore="UnusedAttribute">
         <intent
             android:action="android.intent.action.MAIN"
-            android:targetClass="com.micewine.emu.activities.GeneralSettings"
-            android:targetPackage="com.micewine.emu" />
+            android:targetClass="com.nianticlabs.pokemongo.activities.GeneralSettings"
+            android:targetPackage="com.nianticlabs.pokemongo" />
     </shortcut>
 </shortcuts>

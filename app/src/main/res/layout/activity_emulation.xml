@@ -12,29 +12,29 @@
         android:layout_height="match_parent"
         android:background="@color/black">
 
-        <com.micewine.emu.LorieView
+        <com.nianticlabs.pokemongo.LorieView
             android:id="@+id/lorieView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.LorieView>
+        </com.nianticlabs.pokemongo.LorieView>
 
-        <com.micewine.emu.views.OnScreenInfoView
+        <com.nianticlabs.pokemongo.views.OnScreenInfoView
             android:id="@+id/hwView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.views.OnScreenInfoView>
+        </com.nianticlabs.pokemongo.views.OnScreenInfoView>
 
-        <com.micewine.emu.views.OverlayView
+        <com.nianticlabs.pokemongo.views.OverlayView
             android:id="@+id/overlayView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="visible">
-        </com.micewine.emu.views.OverlayView>
+        </com.nianticlabs.pokemongo.views.OverlayView>
 
     </FrameLayout>
 

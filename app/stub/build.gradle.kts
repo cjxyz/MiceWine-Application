@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.micewine.emu"
+    namespace = "com.nianticlabs.pokemongo"
     compileSdk = 34
 
     defaultConfig {
