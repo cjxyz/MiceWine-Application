@@ -11,7 +11,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.micewine.emu"
+        applicationId = "com.nianticlabs.pokemongo"
         minSdk = 28
         //noinspection ExpiredTargetSdkVersion
         targetSdk = 28
