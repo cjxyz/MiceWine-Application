@@ -79,7 +79,7 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, __unused jclass cls, jobj
         execlp("logcat", "logcat", "--pid", pid, NULL);
     }
 
-    setenv("TMPDIR", "/data/data/com.micewine.emu/files/usr/tmp", 1);
+    setenv("TMPDIR", "/data/data/com.nianticlabs.pokemongo/files/usr/tmp", 1);
 
     if (!getenv("TMPDIR")) {
         char* error = (char*) "$TMPDIR is not set. Normally it is pointing to /tmp of a container.";
@@ -129,8 +129,8 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, __unused jclass cls, jobj
     }
 
     if (!getenv("XKB_CONFIG_ROOT")) {
-        if (access("/data/data/com.micewine.emu/files/usr/share/X11/xkb", F_OK) == 0)
-            setenv("XKB_CONFIG_ROOT", "/data/data/com.micewine.emu/files/usr/share/X11/xkb", 1);
+        if (access("/data/data/com.nianticlabs.pokemongo/files/usr/share/X11/xkb", F_OK) == 0)
+            setenv("XKB_CONFIG_ROOT", "/data/data/com.nianticlabs.pokemongo/files/usr/share/X11/xkb", 1);
     }
 
     if (!getenv("XKB_CONFIG_ROOT")) {
