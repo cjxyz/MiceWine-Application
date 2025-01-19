@@ -799,7 +799,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         @SuppressLint("SdCardPath")
-        val appRootDir = File("/data/data/com.micewine.emu/files")
+        val appRootDir File by lazy {
+            File("/data/data/${applicationContext.packageName}/files")
+        }
         var ratPackagesDir = File("$appRootDir/packages")
         var appBuiltinRootfs: Boolean = false
         private val unixUsername = runCommandWithOutput("whoami").replace("\n", "")

@@ -23,6 +23,7 @@
 #include <linux/in.h>
 #include <arpa/inet.h>
 #include "lorie.h"
+#include "activity.h"
 
 #define log(prio, ...) __android_log_print(ANDROID_LOG_ ## prio, "LorieNative", __VA_ARGS__)
 
@@ -79,7 +80,12 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, __unused jclass cls, jobj
         execlp("logcat", "logcat", "--pid", pid, NULL);
     }
 
-    setenv("TMPDIR", "/data/data/com.micewine.emu/files/usr/tmp", 1);
+    if (packageNameGlobal != NULL) {
+        char *tmpDir;
+        asprintf(&tmpDir, "/data/data/%s/files/usr/tmp", packageNameGlobal);
+        setenv("TMPDIR", tmpDir, 1);
+        free(tmpDir);
+    }
 
     if (!getenv("TMPDIR")) {
         char* error = (char*) "$TMPDIR is not set. Normally it is pointing to /tmp of a container.";
@@ -129,8 +135,16 @@ Java_com_micewine_emu_CmdEntryPoint_start(JNIEnv *env, __unused jclass cls, jobj
     }
 
     if (!getenv("XKB_CONFIG_ROOT")) {
-        if (access("/data/data/com.micewine.emu/files/usr/share/X11/xkb", F_OK) == 0)
-            setenv("XKB_CONFIG_ROOT", "/data/data/com.micewine.emu/files/usr/share/X11/xkb", 1);
+        if (packageNameGlobal != NULL) {
+            char *xkbDir;
+            asprintf(&xkbDir, "/data/data/%s/files/usr/share/X11/xkb", packageNameGlobal);
+            
+            if (access(xkbDir, F_OK) == 0) {
+                setenv("XKB_CONFIG_ROOT", xkbDir, 1);
+            }
+            
+            free(xkbDir);  // Liberar la memoria asignada por asprintf
+        }
     }
 
     if (!getenv("XKB_CONFIG_ROOT")) {

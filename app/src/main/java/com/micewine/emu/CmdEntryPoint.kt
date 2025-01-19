@@ -35,7 +35,7 @@ class CmdEntryPoint internal constructor(args: Array<String>?, context: Context)
     @SuppressLint("WrongConstant", "PrivateApi")
     private fun createIntent(): Intent {
         var targetPackage = Os.getenv("TERMUX_X11_OVERRIDE_PACKAGE")
-        if (targetPackage == null) targetPackage = "com.micewine.emu"
+        if (targetPackage == null) targetPackage = applicationContext.packageName
         // We should not care about multiple instances, it should be called only by `Termux:X11` app
         // which is single instance...
         val bundle = Bundle()

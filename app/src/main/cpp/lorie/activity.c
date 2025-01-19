@@ -16,11 +16,26 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include "lorie.h"
+#include "activity.h"
 
 #pragma clang diagnostic ignored "-Wunknown-pragmas"
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 #pragma ide diagnostic ignored "ConstantFunctionResult"
 #define log(prio, ...) __android_log_print(ANDROID_LOG_ ## prio, "LorieNative", __VA_ARGS__)
+
+// PackageName
+const char *packageNameGlobal = NULL;
+
+void setPackageName(const char *packageName) {
+    packageNameGlobal = packageName;
+}
+
+JNIEXPORT void JNICALL
+Java_com_micewine_emu_MainActivity_nativeSetPackageName(JNIEnv *env, jobject obj, jstring packageName) {
+    const char *nativePackageName = (*env)->GetStringUTFChars(env, packageName, 0);
+    setPackageName(nativePackageName);
+}
+//
 
 extern volatile int conn_fd; // The only variable from shared with X server code.
 
@@ -434,6 +449,6 @@ static void* stderrToLogcatThread(__unused void* cookie) {
 extern char* __progname;
 __attribute__((constructor)) static void init(void) {
     pthread_t t;
-    if (!strcmp(__progname, "com.micewine.emu"))
+    if (!strcmp(__progname, packageNameGlobal))
         pthread_create(&t, NULL, stderrToLogcatThread, NULL);
 }
