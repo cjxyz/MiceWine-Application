@@ -159,6 +159,16 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
         invalidate()
     }
 
+    private fun reorderButtonsAnalogsIDs() {
+        buttonList.forEachIndexed { i, button ->
+            button.id = i + 1
+        }
+
+        analogList.forEachIndexed { i, analog ->
+            analog.id = i + 1
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
          when (event.actionMasked) {
@@ -267,6 +277,7 @@ class OverlayViewCreator @JvmOverloads constructor (context: Context, attrs: Att
 
                      lastSelectedButton = 0
 
+                     reorderButtonsAnalogsIDs()
                      invalidate()
                  }
              }
