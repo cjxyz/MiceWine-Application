@@ -31,6 +31,12 @@ object WineWrapper {
         }
     }
 
+    fun wine_gamescope(args: String) {
+        runCommand(
+            getEnv() + "WINEPREFIX='$winePrefix' taskset ${getCpuHexMask()} gamescope-wm -W 1280 -H 720 -- $IS_BOX64 wine $args"
+        )
+    }
+
     fun wine(args: String) {
         runCommand(
             getEnv() + "WINEPREFIX='$winePrefix' taskset ${getCpuHexMask()} $IS_BOX64 wine $args"

@@ -713,9 +713,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
-                WineWrapper.wine("explorer /desktop=shell,$selectedResolution window_handler TFM")
+                WineWrapper.wine_gamescope("explorer /desktop=shell,$selectedResolution window_handler TFM")
             } else {
-                WineWrapper.wine("start /unix C:\\\\windows\\\\window_handler.exe")
+                WineWrapper.wine_gamescope("start /unix C:\\\\windows\\\\window_handler.exe")
 
                 if (exePath.endsWith(".lnk")) {
                     try {
