@@ -110,7 +110,9 @@ object ShellLoader {
             os?.writeBytes("$cmd\nexit\n")
             os?.flush()
 
-            shell?.waitFor()
+            if (!cmd.endsWith("&")) {
+                shell?.waitFor()
+            }
 
             shell?.destroy()
             os?.close()

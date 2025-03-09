@@ -713,8 +713,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
+                WineWrapper.wine_gamescope_wm()
                 WineWrapper.wine_gamescope("explorer /desktop=shell,$selectedResolution window_handler TFM")
             } else {
+                WineWrapper.wine_gamescope_wm()
                 WineWrapper.wine_gamescope("start /unix C:\\\\windows\\\\window_handler.exe")
 
                 if (exePath.endsWith(".lnk")) {

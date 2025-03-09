@@ -72,6 +72,36 @@ object EnvVars {
         return "${vars.joinToString(" ")} "
     }
 
+    fun getEnv_command_0(): String {
+        val vars = mutableListOf<String>()
+    
+        val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
+        if (savedVarsJson != null) {
+            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+    
+            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+                vars.add(it.key)
+            }
+        }
+    
+        return vars.getOrNull(0) ?: ""
+    }
+
+    fun getEnv_command_1(): String {
+        val vars = mutableListOf<String>()
+    
+        val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
+        if (savedVarsJson != null) {
+            val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+    
+            Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+                vars.add(it.key)
+            }
+        }
+    
+        return vars.getOrNull(1) ?: ""
+    }
+
     fun getEnv(): String {
         val vars = mutableListOf<String>()
 
