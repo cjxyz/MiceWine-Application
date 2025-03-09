@@ -65,7 +65,7 @@ class AboutFragment : Fragment() {
 
         rootView?.findViewById<TextView>(R.id.WineVersion)?.apply {
             CoroutineScope(Dispatchers.IO).launch {
-                val resultText = WineWrapper.wine("--version", true).ifEmpty { "???" }
+                val resultText = "???"
 
                 withContext(Dispatchers.Main) {
                     text = resultText
