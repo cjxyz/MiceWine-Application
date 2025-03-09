@@ -5,6 +5,7 @@ import com.micewine.emu.activities.MainActivity.Companion.cpuAffinity
 import com.micewine.emu.activities.MainActivity.Companion.wineDisksFolder
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.core.EnvVars.getEnv
+import com.micewine.emu.core.EnvVars.getEnv_command
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.core.ShellLoader.runCommandWithOutput
 import java.io.File
@@ -33,7 +34,7 @@ object WineWrapper {
 
     fun wine_gamescope(args: String) {
         runCommand(
-            "WINEPREFIX='$winePrefix'" + getEnv() + "gamescope-wm -W 1280 -H 720 -- $IS_BOX64 wine $args"
+            getEnv() + "WINEPREFIX='$winePrefix'" + " " + getEnv_command() + " " + "gamescope-wm -W 1280 -H 720 -- $IS_BOX64 wine $args"
         )
     }
 

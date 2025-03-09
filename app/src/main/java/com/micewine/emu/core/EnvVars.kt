@@ -55,19 +55,36 @@ object EnvVars {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    fun getEnv(): String {
+    fun getEnv_command(): String {
         val vars = mutableListOf<String>()
 
-        setEnv(vars)
+        // setEnv(vars)
 
         val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
         if (savedVarsJson != null) {
             val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
 
             Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
-                vars.add("${it.key}=${it.value}")
+                vars.add("${it.key}")
             }
         }
+
+        return "${vars.joinToString(" ")} "
+    }
+
+    fun getEnv(): String {
+        val vars = mutableListOf<String>()
+
+        setEnv(vars)
+
+        // val savedVarsJson = sharedPreferences.getString(ENV_VARS_KEY, null)
+        // if (savedVarsJson != null) {
+        //     val type = object : TypeToken<List<EnvironmentVariable>>() {}.type
+
+        //     Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
+        //         vars.add("${it.key}=${it.value}")
+        //     }
+        // }
 
         return "env ${vars.joinToString(" ")} "
     }
