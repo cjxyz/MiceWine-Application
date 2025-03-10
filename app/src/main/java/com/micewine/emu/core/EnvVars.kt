@@ -67,9 +67,11 @@ object EnvVars {
             Gson().fromJson<List<EnvironmentVariable>>(savedVarsJson, type).forEach {
                 vars.add("${it.key}")
             }
+
+            return "${vars.joinToString(" ")} "
         }
 
-        return "${vars.joinToString(" ")} "
+        return ""
     }
 
     fun getEnv_command_0(): String {

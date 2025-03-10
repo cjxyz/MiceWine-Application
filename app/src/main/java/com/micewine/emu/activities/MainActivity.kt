@@ -713,10 +713,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (exePath == "") {
-                WineWrapper.wine_gamescope_wm()
-                WineWrapper.wine_gamescope("explorer /desktop=shell,$selectedResolution window_handler TFM")
+                WineWrapper.wine_gamescope("explorer /desktop=shell,$selectedResolution")
+                WineWrapper.wine_gamescope_wm("/system/bin/linker64 /data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &")
             } else {
-                WineWrapper.wine_gamescope_wm()
                 WineWrapper.wine_gamescope("start /unix C:\\\\windows\\\\window_handler.exe")
 
                 if (exePath.endsWith(".lnk")) {
@@ -735,6 +734,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 }
+                WineWrapper.wine_gamescope_wm("/system/bin/linker64 /data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &")
             }
 
             runCommand("pkill -9 wineserver")

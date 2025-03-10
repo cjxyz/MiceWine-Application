@@ -107,22 +107,24 @@ object ShellLoader {
                 Log.v("ShellLoader", "Trying to exec: '$cmd'")
             }
 
-            os?.writeBytes("$cmd\nexit\n")
-            os?.flush()
-
             if (!cmd.endsWith("&")) {
+                os?.writeBytes("$cmd\nexit\n")
+                os?.flush()
+
                 shell?.waitFor()
+                shell?.destroy()
+                os?.close()
+                stdout?.close()
+                stderr?.close()
+
+                shell = null
+                os = null
+                stdout = null
+                stderr = null
+            } else {
+                os?.writeBytes("$cmd\n")
+                os?.flush()
             }
-
-            shell?.destroy()
-            os?.close()
-            stdout?.close()
-            stderr?.close()
-
-            shell = null
-            os = null
-            stdout = null
-            stderr = null
         }
     }
 

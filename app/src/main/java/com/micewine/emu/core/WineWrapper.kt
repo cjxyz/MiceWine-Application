@@ -34,7 +34,13 @@ object WineWrapper {
 
     fun wine_gamescope_wm() {
         runCommand(
-            getEnv() + "WINEPREFIX='$winePrefix'" + " " + "/system/bin/linker64" + " " + "/data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &"
+            getEnv() + "WINEPREFIX='$winePrefix'" + " " + "/system/bin/linker64 /data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &"
+        )
+    }
+
+    fun wine_gamescope_wm(args: String) {
+        runCommand(
+            getEnv() + "WINEPREFIX='$winePrefix'" + " " + "$args"
         )
     }
 
