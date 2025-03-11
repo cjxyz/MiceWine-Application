@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -47,12 +48,12 @@ import com.micewine.emu.activities.MainActivity.Companion.usrDir
 import com.micewine.emu.activities.MainActivity.Companion.winePrefix
 import com.micewine.emu.activities.MainActivity.Companion.winePrefixesDir
 import com.micewine.emu.adapters.AdapterGame
-import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.core.HighlightState
 import com.micewine.emu.databinding.FragmentShortcutsBinding
 import com.micewine.emu.fragments.CreatePresetFragment.Companion.WINEPREFIX_PRESET
 import com.micewine.emu.fragments.DeleteItemFragment.Companion.DELETE_WINE_PREFIX
 import com.micewine.emu.fragments.VirtualControllerPresetManagerFragment.Companion.preferences
+import com.micewine.emu.fragments.WineSettingsFragment.Companion.availableCPUs
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
@@ -97,10 +98,8 @@ class ShortcutsFragment : Fragment() {
 
         layoutManager = recyclerView?.layoutManager as GridLayoutManager?
 
-        val spanCount = max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
-
-        recyclerView?.layoutManager = GridLayoutManager(requireContext(), spanCount)
-        recyclerView?.addItemDecoration(GridSpacingItemDecoration(spanCount, 20))
+        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
+        recyclerView?.addItemDecoration(GridSpacingItemDecoration(10))
 
         setAdapter()
 
@@ -224,14 +223,19 @@ class ShortcutsFragment : Fragment() {
         return rootView
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        recyclerView?.layoutManager = GridLayoutManager(requireContext(), getSpanCount())
+    }
+
     private fun setupDragAndDrop() {
         val callback = object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ): Int {
-                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
-                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                 return makeMovementFlags(dragFlags, 0)
             }
 
@@ -246,12 +250,8 @@ class ShortcutsFragment : Fragment() {
                 val toPosition = target.adapterPosition
 
                 val initialGame = gameList[fromPosition]
-                val endGame = gameList[toPosition]
 
                 gameList.removeAt(fromPosition)
-                gameList.add(fromPosition, endGame)
-
-                gameList.removeAt(toPosition)
                 gameList.add(toPosition, initialGame)
 
                 recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
@@ -261,9 +261,7 @@ class ShortcutsFragment : Fragment() {
                 return true
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            }
-
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             override fun isLongPressDragEnabled(): Boolean = true
             override fun isItemViewSwipeEnabled(): Boolean = false
         }
@@ -277,22 +275,13 @@ class ShortcutsFragment : Fragment() {
         return dp * density
     }
 
-    class GridSpacingItemDecoration(
-        private val spanCount: Int,
-        private val spacing: Int,
-    ) : RecyclerView.ItemDecoration() {
+    class GridSpacingItemDecoration(private val spacing: Int) : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(
             outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
         ) {
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
-
-            outRect.left = spacing - column * spacing / spanCount
-            outRect.right = (column + 1) * spacing / spanCount
-
-            if (position < spanCount) {
-                outRect.top = spacing
-            }
+            outRect.left = spacing
+            outRect.right = spacing
+            outRect.top = spacing
             outRect.bottom = spacing
         }
     }
@@ -312,6 +301,10 @@ class ShortcutsFragment : Fragment() {
         gameListNames.add(AdapterGame.GameItem(name, exePath, exeArguments, iconPath))
     }
 
+    private fun getSpanCount(): Int {
+        return max(1F, requireActivity().resources.displayMetrics.widthPixels / dpToPx(150, requireContext())).toInt()
+    }
+
     companion object {
         private val gson = Gson()
         private var recyclerView: RecyclerView? = null
@@ -324,6 +317,205 @@ class ShortcutsFragment : Fragment() {
         fun initialize(context: Context) {
             preferences = PreferenceManager.getDefaultSharedPreferences(context)!!
             gameList = getGameList(context)
+        }
+
+        fun putEnableXInput(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].enableXInput = enabled
+
+            saveShortcuts()
+        }
+
+        fun getEnableXInput(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].enableXInput
+        }
+
+        fun putWineVirtualDesktop(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineVirtualDesktop = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineVirtualDesktop(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].wineVirtualDesktop
+        }
+
+        fun putCpuAffinity(name: String, cpuCores: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].cpuAffinityCores = cpuCores
+
+            saveShortcuts()
+        }
+
+        fun getCpuAffinity(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return availableCPUs.joinToString(",")
+
+            return gameList[index].cpuAffinityCores
+        }
+
+        fun putWineServices(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineServices = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineServices(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return false
+
+            return gameList[index].wineServices
+        }
+
+        fun putWineESync(name: String, enabled: Boolean) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineESync = enabled
+
+            saveShortcuts()
+        }
+
+        fun getWineESync(name: String): Boolean {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return true
+
+            return gameList[index].wineESync
+        }
+
+        fun putVKD3DVersion(name: String, vkd3dVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].vkd3dVersion = vkd3dVersion
+
+            saveShortcuts()
+        }
+
+        fun getVKD3DVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "VKD3D-2.8"
+
+            return gameList[index].vkd3dVersion
+        }
+
+        fun putWineD3DVersion(name: String, wineD3DVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].wineD3DVersion = wineD3DVersion
+
+            saveShortcuts()
+        }
+
+        fun getWineD3DVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "WineD3D-(10.0)"
+
+            return gameList[index].wineD3DVersion
+        }
+
+        fun putDXVKVersion(name: String, dxvkVersion: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].dxvkVersion = dxvkVersion
+
+            saveShortcuts()
+        }
+
+        fun getDXVKVersion(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "DXVK-1.10.3-async"
+
+            return gameList[index].dxvkVersion
+        }
+
+        fun putD3DXRenderer(name: String, d3dxRenderer: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].d3dxRenderer = d3dxRenderer
+
+            saveShortcuts()
+        }
+
+        fun getD3DXRenderer(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return "DXVK"
+
+            return gameList[index].d3dxRenderer
+        }
+
+        fun putVulkanDriver(name: String, driverName: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].vulkanDriver = driverName
+
+            saveShortcuts()
+        }
+
+        fun getVulkanDriver(name: String): String {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
+
+            return gameList[index].vulkanDriver
+        }
+
+        fun putDisplaySettings(name: String, displayMode: String, displayResolution: String) {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return
+
+            gameList[index].displayMode = displayMode
+            gameList[index].displayResolution = displayResolution
+
+            saveShortcuts()
+        }
+
+        fun getDisplaySettings(name: String): List<String> {
+            val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return listOf("16:9", "1280x720")
+
+            return listOf(gameList[index].displayMode, gameList[index].displayResolution)
         }
 
         fun putBox64Preset(name: String, presetName: String) {
@@ -339,7 +531,7 @@ class ShortcutsFragment : Fragment() {
         fun getBox64Preset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].box64Preset
         }
@@ -357,7 +549,7 @@ class ShortcutsFragment : Fragment() {
         fun getControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].controllerPreset
         }
@@ -375,7 +567,7 @@ class ShortcutsFragment : Fragment() {
         fun getVirtualControllerPreset(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
 
-            if (index == -1) return "--"
+            if (index == -1) return "default"
 
             return gameList[index].virtualControllerPreset
         }
@@ -383,12 +575,30 @@ class ShortcutsFragment : Fragment() {
         fun addGameToList(path: String, prettyName: String, icon: String) {
             val gameExists = gameList.any { it.name == prettyName }
 
-            if (gameExists) {
-                return
-            }
+            if (gameExists) return
 
             gameList.add(
-                GameItem(prettyName, path, "", icon, "--", "--", "--")
+                GameItem(
+                    prettyName,
+                    path,
+                    "",
+                    icon,
+                    "default",
+                    "default",
+                    "default",
+                    "16:9",
+                    "1280x720",
+                    "",
+                    "DXVK",
+                    "DXVK-1.10.3-async",
+                    "WineD3D-(10.0)",
+                    "VKD3D-2.8",
+                    true,
+                    false,
+                    availableCPUs.joinToString(","),
+                    false,
+                    false
+                )
             )
             gameListNames.add(
                 AdapterGame.GameItem(prettyName, path, "", icon)
@@ -402,6 +612,8 @@ class ShortcutsFragment : Fragment() {
         fun removeGameFromList(name: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return
+
             gameList.removeAt(index)
             gameListNames.removeAt(index)
 
@@ -413,6 +625,8 @@ class ShortcutsFragment : Fragment() {
         fun editGameFromList(name: String, newName: String, newArguments: String) {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return
+
             gameList[index].name = newName
             gameList[index].exeArguments = newArguments
             gameListNames[index].name = newName
@@ -423,13 +637,15 @@ class ShortcutsFragment : Fragment() {
             recyclerView?.adapter?.notifyItemChanged(index)
         }
 
-        fun setIconToGame(context: Context, uri: Uri) {
-            val index = gameList.indexOfFirst { it.name == selectedGameName }
+        fun setIconToGame(name: String, context: Context, uri: Uri) {
+            val index = gameList.indexOfFirst { it.name == name }
 
-            createIconCache(context, uri, selectedGameName)
+            if (index == -1) return
 
-            gameList[index].iconPath = "$usrDir/icons/$selectedGameName-icon"
-            gameListNames[index].iconPath = "$usrDir/icons/$selectedGameName-icon"
+            createIconCache(context, uri, name)
+
+            gameList[index].iconPath = "$usrDir/icons/$name-icon"
+            gameListNames[index].iconPath = "$usrDir/icons/$name-icon"
 
             saveShortcuts()
 
@@ -439,11 +655,15 @@ class ShortcutsFragment : Fragment() {
         fun getGameIcon(name: String): Bitmap? {
             val index = gameList.indexOfFirst { it.name == name }
 
+            if (index == -1) return null
+
             return BitmapFactory.decodeFile(gameList[index].iconPath)
         }
 
         fun getGameExeArguments(name: String): String {
             val index = gameList.indexOfFirst { it.name == name }
+
+            if (index == -1) return ""
 
             return gameList[index].exeArguments
         }
@@ -465,10 +685,15 @@ class ShortcutsFragment : Fragment() {
         private fun getGameList(context: Context): MutableList<GameItem> {
             val json = preferences?.getString("gameList", "")
             val listType = object : TypeToken<MutableList<GameItem>>() {}.type
+            val gameList = gson.fromJson<MutableList<GameItem>>(json, listType)
 
-            return gson.fromJson(json, listType) ?: mutableListOf(
-                GameItem(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "", "", "--", "--", "--")
-            )
+            if (gameList == null) {
+                addGameToList(context.getString(R.string.desktop_mode_init), context.getString(R.string.desktop_mode_init), "")
+
+                return getGameList(context)
+            }
+
+            return gameList
         }
 
         fun addGameToLauncher(context: Context, name: String) {
@@ -509,7 +734,19 @@ class ShortcutsFragment : Fragment() {
             var iconPath: String,
             var box64Preset: String,
             var controllerPreset: String,
-            var virtualControllerPreset: String
+            var virtualControllerPreset: String,
+            var displayMode: String,
+            var displayResolution: String,
+            var vulkanDriver: String,
+            var d3dxRenderer: String,
+            var dxvkVersion: String,
+            var wineD3DVersion: String,
+            var vkd3dVersion: String,
+            var wineESync: Boolean,
+            var wineServices: Boolean,
+            var cpuAffinityCores: String,
+            var wineVirtualDesktop: Boolean,
+            var enableXInput: Boolean
         )
     }
 }

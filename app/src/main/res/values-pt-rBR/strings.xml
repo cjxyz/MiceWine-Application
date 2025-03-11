@@ -62,8 +62,8 @@
     <string name="select_driver_title">Selecionar Driver</string>
     <string name="select_driver_description">Selecionar Driver a ser usado</string>
     <string name="null_description">" "</string>
-    <string name="select_dxvk_title">Selecionar versão do DXVK</string>
-    <string name="select_wined3d_title">"Selecionar versão do WineD3D "</string>
+    <string name="select_dxvk_title">Selecionar Versão do DXVK</string>
+    <string name="select_wined3d_title">"Selecionar Versão do WineD3D "</string>
     <string name="select_d3dx_title">Selecionar Renderizador de DirectX 9/10/11</string>
     <string name="select_gl_profile_title">Selecionar Perfil OpenGL</string>
     <string name="select_gl_profile_description">Selecionar um Perfil OpenGL para VirGL</string>
@@ -179,4 +179,7 @@
     <string name="sound_settings_title">Configurações de Som</string>
     <string name="sound_settings_description">Gerenciar Configurações de Som</string>
     <string name="select_audio_sink">Selecionar Saida de Áudio do PulseAudio</string>
+    <string name="others">Outros</string>
+    <string name="enable_xinput_title">Ativar Controle XInput</string>
+    <string name="enable_wine_virtual_desktop">Ativar Área de Trabalho Virtual Wine</string>
 </resources>

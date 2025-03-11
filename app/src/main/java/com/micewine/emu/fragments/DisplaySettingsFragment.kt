@@ -10,11 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.micewine.emu.R
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_MODE_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.DISPLAY_RESOLUTION_DEFAULT_VALUE
-import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SPINNER
 import com.micewine.emu.activities.GeneralSettingsActivity.Companion.SWITCH
 import com.micewine.emu.activities.MainActivity.Companion.CPU_COUNTER
 import com.micewine.emu.activities.MainActivity.Companion.CPU_COUNTER_DEFAULT_VALUE
@@ -52,12 +47,6 @@ class DisplaySettingsFragment : Fragment() {
 
         settingsList.clear()
 
-        addToAdapter(R.string.display_mode_title, R.string.display_mode_description, arrayOf(
-            "16:9", "4:3", "Native"
-            ),
-            SPINNER, DISPLAY_MODE_DEFAULT_VALUE, DISPLAY_MODE)
-        addToAdapter(R.string.display_resolution_title, R.string.display_resolution_description, null,
-            SPINNER, DISPLAY_RESOLUTION_DEFAULT_VALUE, DISPLAY_RESOLUTION)
         addToAdapter(R.string.enable_ram_counter, R.string.enable_ram_counter_description, null,
             SWITCH, RAM_COUNTER_DEFAULT_VALUE, RAM_COUNTER)
         addToAdapter(R.string.enable_cpu_counter, R.string.enable_cpu_counter_description, null,

@@ -61,11 +61,15 @@ import com.micewine.emu.activities.MainActivity.Companion.enableRamCounter
 import com.micewine.emu.activities.MainActivity.Companion.getCpuInfo
 import com.micewine.emu.activities.MainActivity.Companion.getMemoryInfo
 import com.micewine.emu.activities.MainActivity.Companion.screenFpsLimit
+import com.micewine.emu.activities.MainActivity.Companion.selectedControllerPreset
+import com.micewine.emu.activities.MainActivity.Companion.selectedVirtualControllerPreset
 import com.micewine.emu.activities.MainActivity.Companion.setSharedVars
 import com.micewine.emu.activities.RatManagerActivity.Companion.generateMangoHUDConfFile
 import com.micewine.emu.adapters.AdapterGame.Companion.selectedGameName
 import com.micewine.emu.adapters.AdapterPreset.Companion.PHYSICAL_CONTROLLER
 import com.micewine.emu.adapters.AdapterPreset.Companion.VIRTUAL_CONTROLLER
+import com.micewine.emu.controller.ControllerUtils
+import com.micewine.emu.controller.ControllerUtils.GamePadServer.Companion.gamePadServerRunning
 import com.micewine.emu.controller.ControllerUtils.checkControllerAxis
 import com.micewine.emu.controller.ControllerUtils.checkControllerButtons
 import com.micewine.emu.controller.ControllerUtils.controllerMouseEmulation
@@ -73,6 +77,7 @@ import com.micewine.emu.controller.ControllerUtils.prepareButtonsAxisValues
 import com.micewine.emu.core.ShellLoader
 import com.micewine.emu.core.ShellLoader.runCommand
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getControllerPreset
+import com.micewine.emu.fragments.ShortcutsFragment.Companion.getEnableXInput
 import com.micewine.emu.fragments.ShortcutsFragment.Companion.getVirtualControllerPreset
 import com.micewine.emu.input.InputEventSender
 import com.micewine.emu.input.TouchInputHandler
@@ -135,6 +140,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         }
 
         prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+
+        if (!gamePadServerRunning && getEnableXInput(selectedGameName)) {
+            ControllerUtils.GamePadServer().startServer()
+        }
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -427,6 +436,12 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
             }
         })
 
+        lorieView.setOnFocusChangeListener { _, _ ->
+            if (!lorieView.isInLayout) {
+                lorieView.requestLayout()
+            }
+        }
+
         registerReceiver(receiver, object : IntentFilter() {
             init {
                 addAction(ACTION_START)
@@ -461,7 +476,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
 
         return true
     }
-
 
     override fun onDestroy() {
         unregisterReceiver(receiver)
@@ -556,10 +570,10 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         if (selectedGameName == getString(R.string.desktop_mode_init)) {
             overlayView?.loadPreset(null)
         } else {
-            overlayView?.loadPreset(getVirtualControllerPreset(selectedGameName))
+            overlayView?.loadPreset(selectedVirtualControllerPreset)
         }
 
-        prepareButtonsAxisValues(this, getControllerPreset(selectedGameName))
+        prepareButtonsAxisValues(this, selectedControllerPreset)
     }
 
     public override fun onPause() {
@@ -602,9 +616,6 @@ class EmulationActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener 
         lorieView?.requestFocus()
     }
 
-    /** @noinspection NullableProblems
-     */
-    @SuppressLint("WrongConstant")
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         handler.postDelayed({ lorieView!!.triggerCallback() }, 100)
         return insets
