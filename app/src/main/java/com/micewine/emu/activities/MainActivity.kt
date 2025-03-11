@@ -172,6 +172,7 @@ class MainActivity : AppCompatActivity() {
 
                     lifecycleScope.launch { runXServer(":0") }
                     lifecycleScope.launch { runWine(exePath, exeArguments) }
+                    lifecycleScope.launch { runGameScope() }
                 }
 
                 ACTION_SELECT_FILE_MANAGER -> {
@@ -686,6 +687,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun runGameScope() {
+        withContext(Dispatchers.IO) {
+            WineWrapper.wine_gamescope_wm()
+        }
+        withContext(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, "gamescope-wm running", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private suspend fun runWine(exePath: String, exeArguments: String) {
         withContext(Dispatchers.Default) {
             installDXWrapper(winePrefix!!)
@@ -714,7 +724,6 @@ class MainActivity : AppCompatActivity() {
 
             if (exePath == "") {
                 WineWrapper.wine_gamescope("explorer /desktop=shell,$selectedResolution")
-                WineWrapper.wine_gamescope_wm("/system/bin/linker64 /data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &")
             } else {
                 WineWrapper.wine_gamescope("start /unix C:\\\\windows\\\\window_handler.exe")
 
@@ -734,7 +743,6 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     WineWrapper.wine("'${getSanitizedPath(exePath)}' $exeArguments", "'${getSanitizedPath(File(exePath).parent!!)}'")
                 }
-                WineWrapper.wine_gamescope_wm("/system/bin/linker64 /data/user/0/com.micewine.emu/files/usr/bin/gamescope-wm -W 1280 -H 720 &")
             }
 
             runCommand("pkill -9 wineserver")
